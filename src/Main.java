@@ -2,12 +2,14 @@ import java.util.Scanner;
 
 public class Main {
 
+	static String[][] spreadSheet=null;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String[][] spreadSheet = readIn();
+		spreadSheet = readIn();
 		for (int i=0;i<spreadSheet.length;i++) {
 			for (int j=0;j<spreadSheet[0].length;j++) {
 				if (!isNumeric(spreadSheet[i][j])) {
+					spreadSheet[i][j]="-";
 					spreadSheet[i][j] = evaluate(spreadSheet[i][j]);
 				}
 			}
@@ -18,7 +20,37 @@ public class Main {
 
 	private static String evaluate(String string) {
 		// TODO Auto-generated method stub
-		return null;
+		String[] atoms = string.split("+");
+		int sum = 0;
+		for (String atom:atoms) {
+			String value = evaluateAtom(atom);
+			if (value == "*")
+				return value;
+			else 
+				sum+=Integer.parseInt(evaluateAtom(atom));
+		}
+		return ""+sum;
+	}
+
+	private static String evaluateAtom(String atom) {
+		// TODO Auto-generated method stub
+		int[] coord = translateCoord(atom);
+		String content = spreadSheet[coord[0]][coord[1]];
+		if (content.equals("-")) {
+			content = "*";
+		}
+		else if (!isNumeric(content) && !content.equals("*")) {
+			spreadSheet[coord[0]][coord[1]]="-";
+			content = evaluate(content);
+		}
+		spreadSheet[coord[0]][coord[1]] = content;
+		return content;
+	}
+
+	private static int[] translateCoord(String atom) {
+		// TODO Auto-generated method stub
+		int[] coord = {atom.charAt(0)-'A', Integer.parseInt(atom.substring(1))-1};
+		return coord;
 	}
 
 	private static void print(String[][] spreadSheet) {
